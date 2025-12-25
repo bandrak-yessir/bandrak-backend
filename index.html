@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bandrak Deploy</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",sans-serif}
+body{min-height:100vh;background:url("https://files.catbox.moe/8nxfhk.jpeg") center/cover no-repeat;display:flex;align-items:center;justify-content:center;overflow:hidden;color:#fff}
+.panel{width:92%;max-width:420px;background:rgba(0,0,0,.55);backdrop-filter:blur(14px);border-radius:22px;padding:28px;animation:zoomIn .8s ease}
+@keyframes zoomIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+.logo{width:120px;height:120px;margin:auto;border-radius:50%;overflow:hidden;border:3px solid #00ffcc;box-shadow:0 0 30px rgba(0,255,204,.6);animation:float 4s ease-in-out infinite}
+@keyframes float{0%{transform:translateY(0)}50%{transform:translateY(-8px)}100%{transform:translateY(0)}}
+.logo video{width:100%;height:100%;object-fit:cover}
+.title{text-align:center;margin-top:15px}
+.title h2{font-size:18px}
+.title p{font-size:13px;opacity:.8}
+.menu{margin-top:25px;display:flex;flex-direction:column;gap:14px}
+.card{background:rgba(255,255,255,.08);border-radius:16px;padding:16px;display:flex;gap:14px;align-items:center;cursor:pointer;transition:.35s;animation:slideUp .8s ease forwards}
+.card:nth-child(1){animation-delay:.2s}
+.card:nth-child(2){animation-delay:.35s}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.card:hover{transform:translateY(-4px);background:rgba(0,255,204,.15);box-shadow:0 10px 25px rgba(0,255,204,.35)}
+.icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;background:linear-gradient(135deg,#00ffcc,#00c9ff);color:#000;flex-shrink:0}
+.card h3{font-size:15px}
+.card span{font-size:12px;opacity:.75}
+.formBox{display:none;margin-top:18px;animation:fade .5s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+input,button{width:100%;padding:12px;margin-top:10px;border-radius:10px;border:none;outline:none}
+input{background:#fff}
+.meta{text-align:left;font-size:12px;opacity:.85;margin-top:6px}
+.meta span{color:#00ffcc}
+button{background:linear-gradient(135deg,#00ffcc,#00c9ff);font-weight:bold;cursor:pointer;transition:.3s}
+button:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,255,204,.5)}
+.footer{margin-top:18px;text-align:center;font-size:12px;opacity:.85}
+.footer a{color:#00ffcc;text-decoration:none}
+.loading{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.7);backdrop-filter:blur(10px);color:#00ffcc;z-index:999;font-size:18px}
+</style>
+</head>
+<body>
+<div class="loading" id="loading">Deploying...</div>
+<div class="panel">
+  <div class="logo">
+    <video src="https://files.catbox.moe/on19cg.mp4" autoplay loop muted></video>
+  </div>
+  <div class="title">
+    <h2>SELAMAT DATANG DI WEBSITE DEPLOY</h2>
+    <p>SIMPEL • CEPAT • OTOMATIS</p>
+  </div>
+  <div class="menu">
+    <div class="card" onclick="showForm()">
+      <div class="icon">⬆️</div>
+      <div>
+        <h3>Upload Project</h3>
+        <span>Upload file HTML / ZIP website kamu</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="icon">🚀</div>
+      <div>
+        <h3>Deploy Otomatis</h3>
+        <span>Admin akan menerima & deploy website</span>
+      </div>
+    </div>
+  </div>
+  <div class="formBox" id="formBox">
+    <form id="uploadForm">
+      <input type="text" id="siteName" name="siteName" placeholder="Nama website kamu" required>
+      <div class="meta">
+        Preview URL:<br>
+        https://deploy.bandrak/<span id="slugPreview">nama-website</span><br>
+        <span id="charCount">0 / 30</span>
+      </div>
+      <input type="file" name="project" required>
+      <button type="submit">KIRIM PROJECT</button>
+    </form>
+  </div>
+  <div class="footer">
+    <p>𝐁𝐚𝐧𝐝𝐫𝐚𝐤 || 𝐒𝐡𝐨𝐩 &lt;/&gt;</p>
+    <a href="https://whatsapp.com/channel/0029Vb6513YEVccC4t7DQD2S" target="_blank">Join Saluran Developer</a>
+  </div>
+</div>
+<script>
+const formBox=document.getElementById("formBox");
+const form=document.getElementById("uploadForm");
+const loading=document.getElementById("loading");
+function showForm(){formBox.style.display="block";formBox.scrollIntoView({behavior:"smooth"})}
+const siteInput=document.getElementById("siteName");
+const slugPreview=document.getElementById("slugPreview");
+const charCount=document.getElementById("charCount");
+siteInput.addEventListener("input",()=>{
+  let raw=siteInput.value.slice(0,30);
+  siteInput.value=raw;
+  let slug=raw.toLowerCase().replace(/[^a-z0-9\s-]/g,"").trim().replace(/\s+/g,"-");
+  slugPreview.textContent=slug||"nama-website";
+  charCount.textContent=raw.length+" / 30";
+});
+form.addEventListener("submit",async e=>{
+  e.preventDefault();
+  loading.style.display="flex";
+  const data=new FormData(form);
+  const res=await fetch("/deploy",{method:"POST",body:data});
+  const json=await res.json();
+  loading.style.display="none";
+  alert(json.message||"Selesai");
+});
+</script>
+</body>
+</html>
